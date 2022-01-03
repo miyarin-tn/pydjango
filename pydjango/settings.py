@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'oauth2_provider',
+    'drf_yasg',
+    'debug_toolbar',
     'pyapp.apps.PyappConfig',
 ]
 
@@ -49,6 +52,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
 
 ROOT_URLCONF = 'pydjango.urls'
@@ -127,7 +131,54 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Absolute filesystem path to the directory that will hold user-uploaded files
+# https://docs.djangoproject.com/en/4.0/ref/settings/#media-root
+MEDIA_ROOT = '%s/pyapp/static/' % BASE_DIR
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# The model to use to represent a User
+# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-user-model
+
+AUTH_USER_MODEL = 'pyapp.User'
+
+# Settings for rest framework
+# https://www.django-rest-framework.org/tutorial/quickstart/#settings
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
+}
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        # 'Bearer': {
+        #     'type': 'apiKey',
+        #     'name': 'Authorization',
+        #     'in': 'header'
+        # },
+        "Oauth2": {
+            "type": "oauth2",
+            "tokenUrl": "/oauth/token/",
+            "flow": "password",
+            "scopes": {
+                "read": "Read scope",
+                "write": "Write scope"
+            }
+        }
+    },
+    'USE_SESSION_AUTH': False,
+}
+
+# Internal ips for debug
+# https://django-debug-toolbar.readthedocs.io/en/latest/installation.html#configure-internal-ips
+
+INTERNAL_IPS = [
+    '127.0.0.1',
+]
